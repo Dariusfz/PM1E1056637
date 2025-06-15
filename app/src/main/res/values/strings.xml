@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">PM1E1056637</string>
+    <string name="pais">País</string>
+    <string name="nombre">Nombre</string>
+    <string name="telefono">Teléfono</string>
+    <string name="nota">Nota</string>
+    <string name="btnagregar">Salvar contactos</string>
+    <string name="btnvercontactos">Contactos salvados</string>
+    <string name="nombrepais">Nombre del País</string>
+    <string name="codigoRegion">Código de Región</string>
+    <string name="btnAgregarPais">Agregar País</string>
+</resources>

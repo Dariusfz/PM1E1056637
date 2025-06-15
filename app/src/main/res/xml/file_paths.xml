@@ -1,0 +1,9 @@
+<?xml version ="1.0" encoding ="utf-8"?>
+
+<paths>
+    <!-- Directorio de imágenes específico de la app -->
+    <external-files-path name="my_images" path="Pictures" />
+
+    <!-- Para compartir archivos temporalmente -->
+    <cache-path name="shared_images" path="shared_images/" />
+</paths>
