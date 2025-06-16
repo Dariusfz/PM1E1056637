@@ -1,11 +1,13 @@
 package com.example.pm1e1056637;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,11 +19,16 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import android.Manifest;
 
 import com.example.pm1e1056637.configuracion.Contacto;
 import com.example.pm1e1056637.configuracion.Pais;
@@ -43,7 +50,8 @@ public class ListaContactos extends AppCompatActivity {
     ArrayList<String> lista;
 
     Button btnAtras, btnCompartir, btnVerImagen, btnEliminar, btnActualizar;
-    private int posicion = -1;
+    int posicion = -1;
+    private static final int CODIGO_PERMISO_LLAMADA = 101;
 
 
     @Override
@@ -53,10 +61,9 @@ public class ListaContactos extends AppCompatActivity {
         setContentView(R.layout.activity_lista_contactos);
 
 
-
         listaContactos = findViewById(R.id.listaContactos);
         txtBuscar = findViewById(R.id.txtBuscar);
-        btnAtras= findViewById(R.id.btnAtras);
+        btnAtras = findViewById(R.id.btnAtras);
         btnCompartir = findViewById(R.id.btnCompartir);
         btnActualizar = findViewById(R.id.btnActualizar);
         btnEliminar = findViewById(R.id.btnEliminar);
@@ -64,8 +71,8 @@ public class ListaContactos extends AppCompatActivity {
 
         listaContactos.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
-        conexion= new SQLConexion(this,
-                Transacciones.NameDB,null,MainActivity.version);
+        conexion = new SQLConexion(this,
+                Transacciones.NameDB, null, MainActivity.version);
 
         listaContactos.setOnItemClickListener((parent, view, po, id) -> {
             posicion = po;
@@ -77,7 +84,7 @@ public class ListaContactos extends AppCompatActivity {
         });
 
         obtenerContactos();
-        ArrayAdapter adp = new ArrayAdapter(this, android.R.layout.simple_list_item_1,lista);
+        ArrayAdapter adp = new ArrayAdapter(this, android.R.layout.simple_list_item_1, lista);
         listaContactos.setAdapter(adp);
 
         //metodo para buscar contactos en tiempo real
@@ -98,11 +105,11 @@ public class ListaContactos extends AppCompatActivity {
         btnAtras.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
             }
         });
-        
+
         btnCompartir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -131,6 +138,52 @@ public class ListaContactos extends AppCompatActivity {
             }
         });
 
+        listaContactos.setOnItemLongClickListener((parent, view, position, id) -> {
+
+            Contacto contacto = listContacto.get(position);
+
+            mostrarDialogoLlamada(contacto.getTelefono());
+
+            return true;
+        });
+
+        btnEliminar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                eliminarContactoSeleccionado();
+            }
+        });
+
+        btnActualizar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               Toast.makeText(getApplicationContext(),"NO QUEDO TIEMPO INGE ;(", Toast.LENGTH_LONG).show();
+            }
+        });
+
+
+    }
+
+
+
+    private void mostrarDialogoLlamada(String numeroTelefono) {
+
+        String numeroFormateado = formatoTelefono(numeroTelefono);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Llamar a contacto")
+                .setMessage("¿Deseas llamar al número " + numeroFormateado + "?")
+                .setPositiveButton("Llamar", (dialog, which) -> {
+                    // Verificar permisos antes de llamar
+                    if (tienePermisoLlamada()) {
+                        iniciarLlamada(numeroTelefono);
+                    } else {
+                        solicitarPermisoLlamada();
+                    }
+                })
+                .setNegativeButton("Cancelar", null)
+                .setIcon(android.R.drawable.ic_menu_call)
+                .show();
     }
 
     private void mostrarImagenContacto(byte[] imagenBlob) {
@@ -215,18 +268,17 @@ public class ListaContactos extends AppCompatActivity {
         listaContactos.setAdapter(adapter);
     }
 
-    private void obtenerContactos()
-    {
+    private void obtenerContactos() {
         try {
             SQLiteDatabase db = conexion.getReadableDatabase();
             Contacto objContacto = null;
 
 
             listContacto = new ArrayList<>();
-            Cursor cursor= db.rawQuery(Transacciones.busquedaContacto,null);
+            Cursor cursor = db.rawQuery(Transacciones.busquedaContacto, null);
 
 
-            while (cursor.moveToNext()){
+            while (cursor.moveToNext()) {
                 objContacto = new Contacto();
 
                 objContacto.setId(cursor.getInt(0));
@@ -245,13 +297,109 @@ public class ListaContactos extends AppCompatActivity {
         }
     }
 
-    private void fillDataContactos()
-    {
-        lista= new ArrayList<String>();
+    private void fillDataContactos() {
+        lista = new ArrayList<String>();
 
-        for(int i=0; i<listContacto.size();i++){
-            lista.add(listContacto.get(i).getNombre()+" | "+listContacto.get(i).getTelefono());
+        for (int i = 0; i < listContacto.size(); i++) {
+            lista.add(listContacto.get(i).getNombre() + " | " + listContacto.get(i).getTelefono());
         }
     }
 
+    //metodo para llamar al contacto
+    private boolean tienePermisoLlamada() {
+        return ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void solicitarPermisoLlamada() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.CALL_PHONE},
+                CODIGO_PERMISO_LLAMADA);
+    }
+
+    private void iniciarLlamada(String numero) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_CALL);
+            intent.setData(Uri.parse("tel:" + limpiarNumero(numero)));
+            startActivity(intent);
+        } catch (SecurityException e) {
+            Toast.makeText(this, "Permiso denegado para realizar llamadas",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String limpiarNumero(String numero) {
+
+        return numero.replaceAll("[^0-9+]", "");
+    }
+
+    private String formatoTelefono(String numero) {
+        String limpio = limpiarNumero(numero);
+        if (limpio.length() > 3) {
+            return limpio.substring(0, 3) + " " + limpio.substring(3);
+        }
+        return limpio;
+    }
+
+    //METODO PARA ELIMINAR UN CONTACTO
+    private void eliminarContactoSeleccionado() {
+
+        if (posicion == -1 || posicion >= listContacto.size()) {
+            Toast.makeText(this, "Selecciona un contacto primero", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Mostrar diálogo
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmar")
+                .setMessage("Estas seguro de eliminar este contacto?")
+                .setPositiveButton("Eliminar", (dialog, which) -> {
+                    // Obtener el contacto a eliminar
+                    Contacto contacto = listContacto.get(posicion);
+
+                    // Eliminar de la base de datos
+                    SQLiteDatabase db = conexion.getWritableDatabase();
+                    try {
+                        int filasEliminadas = db.delete(
+                                Transacciones.tablaContactos,
+                                Transacciones.id + " = ?",
+                                new String[]{String.valueOf(contacto.getId())}
+                        );
+
+                        if (filasEliminadas > 0) {
+                            // Eliminar de la lista en memoria
+                            listContacto.remove(posicion);
+
+                            // Actualizar la vista para que desaparezca el contacto eliminado
+                            actualizarVista();
+
+                            Toast.makeText(this, "Contacto eliminado", Toast.LENGTH_SHORT).show();
+
+                            // Resetear selección
+                            posicion = -1;
+                        } else {
+                            Toast.makeText(this, "Error al eliminar el contacto", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception e) {
+                        Log.e("ELIMINAR", "Error: " + e.getMessage());
+                        Toast.makeText(this, "Error al eliminar", Toast.LENGTH_SHORT).show();
+                    } finally {
+                        db.close();
+                    }
+                })
+                .setNegativeButton("Cancelar", null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
+    // Metodo para actualizar la vista
+    private void actualizarVista() {
+        lista.clear();
+        for (Contacto contacto : listContacto) {
+            lista.add(contacto.getNombre() + " | " + contacto.getTelefono());
+        }
+
+        ArrayAdapter<String> adapter = (ArrayAdapter<String>) listaContactos.getAdapter();
+        adapter.notifyDataSetChanged();
+    }
 }

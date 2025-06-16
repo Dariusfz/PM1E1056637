@@ -63,8 +63,8 @@ public class MainActivity extends AppCompatActivity {
 
     static  final int peticionCamara= 101;
     static final int peticionFoto= 102;
-    private static final int REQUEST_PERMISSIONS = 101;
-    private String[] requiredPermissions;
+
+
 
 
     @Override
@@ -124,6 +124,8 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+
 
 
 
@@ -305,9 +307,9 @@ public class MainActivity extends AppCompatActivity {
         Long resultado = db.insert(Transacciones.tablaContactos,Transacciones.id,values);
 
         if(resultado != -1){
-            Toast.makeText(getApplicationContext(), "Contacto ingresado con exito "+resultado.toString(),Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Contacto ingresado con exito ",Toast.LENGTH_LONG).show();
         }else{
-            Toast.makeText(getApplicationContext(), "Erros al ingresar la persona "+resultado.toString(),Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Erros al ingresar la persona ",Toast.LENGTH_LONG).show();
         }
         db.close();
     }

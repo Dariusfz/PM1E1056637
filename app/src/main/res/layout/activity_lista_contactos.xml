@@ -3,96 +3,109 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorFondo"
+    android:padding="8dp"
     tools:context=".ListaContactos">
 
-    <Button
-        android:id="@+id/btnAtras"
-        android:layout_width="125dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="5dp"
-        android:text="Atrás" />
-
-    <SearchView
-        android:id="@+id/txtBuscar"
+    <!-- Barra superior con botón Atrás y búsqueda -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:background="@drawable/text_file_redondeado"
         android:layout_height="wrap_content"
-        android:queryHint="Buscar contacto" />
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:paddingBottom="8dp">
 
+        <Button
+            android:id="@+id/btnAtras"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="← Atrás"
+            android:textSize="16sp"
+            android:drawablePadding="4dp" />
 
+        <SearchView
+            android:id="@+id/txtBuscar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/text_file_redondeado"
+            android:queryHint="Buscar contacto..."
+            android:iconifiedByDefault="false"/>
+    </LinearLayout>
+
+    <!-- CardView para la lista -->
     <androidx.cardview.widget.CardView
         android:id="@+id/CardView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_margin="16dp"
-        android:layout_marginBottom="10dp">
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="4dp">
 
         <ListView
             android:id="@+id/listaContactos"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:dividerHeight="1dp"
+            android:scrollbars="vertical"
+            android:fastScrollEnabled="true"/>
     </androidx.cardview.widget.CardView>
 
-
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
+        android:orientation="horizontal"
+        android:weightSum="2"
         android:padding="8dp">
 
-
         <LinearLayout
-            android:id="@+id/columnaIzquierda"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:orientation="vertical">
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
 
             <Button
                 android:id="@+id/btnCompartir"
-                android:layout_width="150dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="10dp"
-                android:text="Compartir contacto"
-                android:layout_margin="4dp"/>
+                android:text="Compartir"
+               />
 
             <Button
                 android:id="@+id/btnEliminar"
-                android:layout_width="150dp"
-                android:textSize="10dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Eliminar Contacto"
-                android:layout_margin="4dp"/>
+                android:text="Eliminar"
+               />
         </LinearLayout>
 
-
+        <!-- Columna derecha -->
         <LinearLayout
-            android:id="@+id/columnaDerecha"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:orientation="vertical">
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
 
             <Button
                 android:id="@+id/btnVerImg"
-                android:layout_width="150dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="10dp"
                 android:text="Ver imagen"
-                android:layout_margin="4dp"/>
+             />
 
             <Button
                 android:id="@+id/btnActualizar"
-                android:layout_width="150dp"
-                android:textSize="10dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Actualizar Contacto"
-                android:layout_margin="4dp"/>
+                android:text="Actualizar"
+            />
         </LinearLayout>
-    </RelativeLayout>
+    </LinearLayout>
+
 </LinearLayout>

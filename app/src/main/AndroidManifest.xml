@@ -8,10 +8,19 @@
     <uses-feature
         android:name="android.hardware.camera2"
         android:required="true" />
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
 
     <uses-permission android:name="android.permission.CAMERA" /> <!-- solicitamos permisos a la camara -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" /> <!-- solicitamos permisos para guardar imagenes -->
+    <uses-permission android:name="android.permission.CALL_PHONE" /> <!-- solicitamos permisos para realizar llamadas-->
     <queries>
+
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+            <data android:scheme="tel" />
+        </intent>
 
         <!-- Browser -->
         <intent>
@@ -47,9 +56,7 @@
         <activity
             android:name=".ListaContactos"
             android:exported="false" />
-        <activity
-            android:name=".AgregarPais"
-            android:exported="false" />
+
 
         <provider
             android:name="androidx.core.content.FileProvider"
