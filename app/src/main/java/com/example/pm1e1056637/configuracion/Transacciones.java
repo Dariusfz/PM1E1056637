@@ -25,14 +25,15 @@ public class Transacciones {
             telefono+" TEXT, "+
             nota+" TEXT, "+
             pais+" TEXT, "+
-            codigoPais+" TEXT,"+
             fotoPersona+" BLOB)";
 
     //DROP TABLE
     public static final String DROPTableContactos="DROP TABLE IF EXISTS "+tablaContactos;
 
     //DML SELECT
-    public static final String selectContactos = "SELECT c." + id + ", c." + nombre + ", c." + telefono + ", p." + codigoPais + " FROM " + tablaContactos + " c" +
+    public static final String selectContactos = "SELECT c." + id + ", c." + nombre + ", c." + telefono + ", p." + codigoPais +", c."+fotoPersona+ " FROM " + tablaContactos + " c" +
                     " LEFT JOIN " + TransaccionesPais.tablaPaises + " p ON c." + pais + " = p." + TransaccionesPais.nombrePais;
+
+    public static final String busquedaContacto ="SELECT id, nombre, telefono, imagen FROM contactos";
 
 }

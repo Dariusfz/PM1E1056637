@@ -96,8 +96,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 validacion();
-                agregarContactos();
-                limpiarDatos();
+
+                if(validacion()){
+                    agregarContactos();
+                    limpiarDatos();
+                }
+
+
             }
         });
 
@@ -274,14 +279,17 @@ public class MainActivity extends AppCompatActivity {
     //metodo para agregar contactos
     public void agregarContactos(){
         conexion = new SQLConexion(this,Transacciones.NameDB,null,version);
+        Pais objPais = new Pais();
+
         SQLiteDatabase db = conexion.getWritableDatabase();
-        String paisDeOrigen = paises.getSelectedItem().toString();
+
+        String paisDeOrigen = paises.getSelectedItem().toString();// obtenemos el pais selecionado por el usuario
         ContentValues values = new ContentValues();
         values.put(Transacciones.nombre,txtNombre.getText().toString());
         values.put(Transacciones.telefono, txtTelefono.getText().toString());
         values.put(Transacciones.nota,txtNota.getText().toString());
         values.put(Transacciones.pais,paisDeOrigen);
-        values.put(Transacciones.codigoPais, );
+        values.put(Transacciones.codigoPais,objPais.getCodRegion());
 
 
         if (rutaImagen != null) {
